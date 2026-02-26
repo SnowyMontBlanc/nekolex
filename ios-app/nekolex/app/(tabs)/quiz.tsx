@@ -8,6 +8,7 @@ import { ScreenBackground } from '@/components/screen-background';
 import { useUser } from '@/contexts/user-context';
 import { QuizQuestion } from '@/components/quiz-question';
 import { generateQuiz } from '@/utils/quiz-generator';
+import { setQuizSession } from '@/utils/quiz-session';
 import type { QuizDifficulty, QuizQuestion as QuizQuestionType } from '@/types';
 
 type QuizState = 'select' | 'playing';
@@ -74,16 +75,8 @@ export default function QuizScreen() {
       setCurrentIndex((prev) => prev + 1);
       setIsAnswered(false);
     } else {
-      router.push({
-        pathname: '/quiz-result',
-        params: {
-          difficulty,
-          score: String(score),
-          total: String(questions.length),
-          questions: JSON.stringify(questions),
-          answers: JSON.stringify(answers),
-        },
-      });
+      setQuizSession({ difficulty, score, total: questions.length, questions, answers });
+      router.push('/quiz-result');
       setState('select');
       setCurrentIndex(0);
       setAnswers([]);

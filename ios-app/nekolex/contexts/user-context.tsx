@@ -4,7 +4,7 @@ import {
   getUserProfile,
   saveUserProfile,
   getDiscoveredBreeds,
-  saveDiscoveredBreed,
+  saveAllDiscoveredBreeds,
   saveQuizResult as saveQuizResultToStorage,
   initializeStorage,
 } from '@/services/storage';
@@ -59,6 +59,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const clearPendingLevelUp = useCallback(() => setPendingLevelUp(null), []);
 
   const discoverBreed = useCallback(async (breedId: string, photoUrl?: string) => {
+    // Guard: already discovered — no XP awarded
+    if (discoveredBreeds[breedId]) return;
+
     const progress: UserBreedProgress = {
       breed_id: breedId,
       discovered_at: new Date().toISOString(),
@@ -68,20 +71,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       mastery_level: 0,
     };
 
-    await saveDiscoveredBreed(breedId, progress);
-
-    let newCount = 0;
     setDiscoveredBreeds((prev) => {
-      if (prev[breedId]) return prev; // Already discovered
-      const updated = { ...prev, [breedId]: progress };
-      newCount = Object.keys(updated).length;
-      return updated;
+      if (prev[breedId]) return prev; // race condition guard
+      const next = { ...prev, [breedId]: progress };
+      saveAllDiscoveredBreeds(next);
+      return next;
     });
 
     setProfile((prev) => {
       const updatedProfile = {
         ...prev,
-        discovered_count: newCount || prev.discovered_count + 1,
+        discovered_count: prev.discovered_count + 1,
       };
       const newXp = updatedProfile.xp + XP_REWARDS.DISCOVER_BREED;
       const newLevel = calculateLevel(newXp);
@@ -92,7 +92,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
       return final;
     });
-  }, []);
+  }, [discoveredBreeds]);
 
   const completeQuiz = useCallback(async (result: QuizResult) => {
     await saveQuizResultToStorage(result);
@@ -119,8 +119,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (!breed) return prev;
 
       const updated = updateMasteryLevel(correct, breed);
-      saveDiscoveredBreed(breedId, updated);
-      return { ...prev, [breedId]: updated };
+      const next = { ...prev, [breedId]: updated };
+      saveAllDiscoveredBreeds(next);
+      return next;
     });
   }, []);
 

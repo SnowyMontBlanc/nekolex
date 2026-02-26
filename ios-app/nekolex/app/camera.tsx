@@ -18,7 +18,8 @@ import { useUser } from '@/contexts/user-context';
 import { prepareImageForApi, saveBreedPhoto } from '@/services/image-processor';
 import { identifyBreed, IdentificationError } from '@/services/gemini-api';
 import { playDiscover } from '@/services/sound';
-import { LevelUpAnimation } from '@/components/animations';
+import { LevelUpAnimation, DiscoveryAnimation } from '@/components/animations';
+import { XP_REWARDS } from '@/utils/xp-calculator';
 import breedsData from '@/data/breeds.json';
 import type { Breed, IdentificationResult } from '@/types';
 
@@ -34,6 +35,7 @@ export default function CameraScreen() {
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [result, setResult] = useState<IdentificationResult | null>(null);
   const [isNewDiscovery, setIsNewDiscovery] = useState(false);
+  const [showDiscoveryAnimation, setShowDiscoveryAnimation] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const pickImage = async (fromCamera: boolean) => {
@@ -84,6 +86,7 @@ export default function CameraScreen() {
         const savedPhoto = saveBreedPhoto(uri, identification.breed_id);
         await discoverBreed(identification.breed_id, savedPhoto);
         setIsNewDiscovery(true);
+        setShowDiscoveryAnimation(true);
         playDiscover();
       }
 
@@ -103,6 +106,7 @@ export default function CameraScreen() {
     setImageUri(null);
     setResult(null);
     setIsNewDiscovery(false);
+    setShowDiscoveryAnimation(false);
     setErrorMessage('');
   };
 
@@ -150,16 +154,7 @@ export default function CameraScreen() {
       {/* Result State */}
       {state === 'result' && result && breed && (
         <View style={styles.resultContainer}>
-          {isNewDiscovery && (
-            <View style={styles.discoveryBanner}>
-              <View style={styles.buttonContent}>
-                <Ionicons name="flash" size={16} color={NekoLexColors.textInverse} />
-                <Text style={styles.discoveryText}>新発見！ +10 XP</Text>
-              </View>
-            </View>
-          )}
-
-          <Text style={styles.resultName}>{breed.name_ja}</Text>
+              <Text style={styles.resultName}>{breed.name_ja}</Text>
           <Text style={styles.resultNameEn}>{breed.name_en}</Text>
 
           <View style={styles.confidenceRow}>
@@ -202,6 +197,13 @@ export default function CameraScreen() {
             <Text style={styles.buttonText}>もう一度試す</Text>
           </TouchableOpacity>
         </View>
+      )}
+      {showDiscoveryAnimation && result && breedMap.get(result.breed_id) && (
+        <DiscoveryAnimation
+          breedName={breedMap.get(result.breed_id)!.name_ja}
+          xp={XP_REWARDS.DISCOVER_BREED}
+          onComplete={() => setShowDiscoveryAnimation(false)}
+        />
       )}
       {pendingLevelUp !== null && (
         <LevelUpAnimation newLevel={pendingLevelUp} onComplete={clearPendingLevelUp} />
@@ -284,17 +286,6 @@ const styles = StyleSheet.create({
   resultContainer: {
     flex: 1,
     padding: 20,
-  },
-  discoveryBanner: {
-    backgroundColor: NekoLexColors.accent,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  discoveryText: {
-    fontSize: Typography.subheading.fontSize, fontWeight: '700' as const,
-    color: NekoLexColors.text,
   },
   resultName: {
     fontSize: Typography.heading.fontSize, fontWeight: '800' as const, letterSpacing: -0.5,

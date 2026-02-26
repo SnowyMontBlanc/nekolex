@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: NekoLexColors.border,
   },
   metaLabel: {
     ...Typography.caption,

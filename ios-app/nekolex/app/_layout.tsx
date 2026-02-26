@@ -26,7 +26,7 @@ export default function RootLayout() {
             <Stack.Screen name="quiz-result" options={{ title: 'クイズ結果', presentation: 'modal' }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           </Stack>
-          <StatusBar style="dark" backgroundColor={NekoLexColors.background} />
+          <StatusBar style="light" backgroundColor={NekoLexColors.background} />
         </ThemeProvider>
       </UserProvider>
     </SafeAreaProvider>

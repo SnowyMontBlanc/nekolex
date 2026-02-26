@@ -73,6 +73,16 @@ export async function saveDiscoveredBreed(
   }
 }
 
+export async function saveAllDiscoveredBreeds(
+  breeds: Record<string, UserBreedProgress>,
+): Promise<void> {
+  try {
+    await AsyncStorage.setItem(KEYS.BREEDS_DISCOVERED, JSON.stringify(breeds));
+  } catch (error) {
+    console.error('Failed to save discovered breeds:', error);
+  }
+}
+
 export async function isBreedDiscovered(breedId: string): Promise<boolean> {
   const discovered = await getDiscoveredBreeds();
   return breedId in discovered;

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { NekoLexColors, Typography } from '@/constants/theme';
@@ -9,6 +9,7 @@ import { useUser } from '@/contexts/user-context';
 import { hapticSuccess, hapticError, hapticLight } from '@/services/haptics';
 import { LevelUpAnimation } from '@/components/animations';
 import { XP_REWARDS } from '@/utils/xp-calculator';
+import { getQuizSession, clearQuizSession } from '@/utils/quiz-session';
 import breedsData from '@/data/breeds.json';
 import type { Breed, QuizDifficulty, QuizQuestion } from '@/types';
 
@@ -28,15 +29,13 @@ function getResultTier(percentage: number, isPerfect: boolean): ResultTier {
 export default function QuizResultScreen() {
   const router = useRouter();
   const { completeQuiz, updateBreedReview, pendingLevelUp, clearPendingLevelUp } = useUser();
-  const params = useLocalSearchParams<{
-    difficulty: string; score: string; total: string; questions: string; answers: string;
-  }>();
 
-  const difficulty = (params.difficulty ?? 'easy') as QuizDifficulty;
-  const score = parseInt(params.score ?? '0', 10);
-  const total = parseInt(params.total ?? '5', 10);
-  const questions: QuizQuestion[] = params.questions ? JSON.parse(params.questions) : [];
-  const answers: (string | null)[] = params.answers ? JSON.parse(params.answers) : [];
+  const session = getQuizSession();
+  const difficulty: QuizDifficulty = session?.difficulty ?? 'easy';
+  const score = session?.score ?? 0;
+  const total = session?.total ?? 0;
+  const questions: QuizQuestion[] = session?.questions ?? [];
+  const answers: (string | null)[] = session?.answers ?? [];
 
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
   const isPerfect = score === total && total > 0;
@@ -51,6 +50,8 @@ export default function QuizResultScreen() {
     savedRef.current = true;
 
     const saveResult = async () => {
+      clearQuizSession();
+
       // Haptic feedback based on score
       if (isPerfect || percentage >= 80) {
         hapticSuccess();
