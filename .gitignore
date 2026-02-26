@@ -8,3 +8,7 @@
 .env
 .env.local
 .env*.local
+
+# AI tooling (Claude Code / Serena)
+.claude/
+.serena/
