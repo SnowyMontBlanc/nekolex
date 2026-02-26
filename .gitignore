@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# mise
+.mise.local.toml
+
+# env files (secrets)
+.env
+.env.local
+.env*.local
