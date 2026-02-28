@@ -86,7 +86,7 @@ export function QuizQuestion({ question, onAnswer, isAnswered, selectedAnswer }:
               activeOpacity={isAnswered ? 1 : 0.8}
               disabled={isAnswered}>
               <View style={[styles.optionLabel, s.label]}>
-                <Text style={[styles.optionLabelText, s.label]}>{OPTION_LABELS[index]}</Text>
+                <Text style={styles.optionLabelText}>{OPTION_LABELS[index]}</Text>
               </View>
               <Text style={[styles.optionText, s.text]} numberOfLines={2}>
                 {option.label}
