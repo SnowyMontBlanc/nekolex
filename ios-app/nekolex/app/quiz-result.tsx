@@ -15,6 +15,11 @@ import type { Breed, QuizDifficulty, QuizQuestion } from '@/types';
 
 const breedMap = new Map((breedsData.breeds as Breed[]).map((b) => [b.id, b]));
 
+// difference_choice wrong options use IDs like "british_shorthair_w0" — strip suffix to look up breed
+function getBreedByAnswerId(answerId: string): Breed | undefined {
+  return breedMap.get(answerId) ?? breedMap.get(answerId.replace(/_w\d+$/, ''));
+}
+
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 type ResultTier = { icon: IoniconsName; title: string; color: string; bgColor: string; borderColor: string };
 
@@ -131,7 +136,7 @@ export default function QuizResultScreen() {
             const userAnswer = answers[i];
             const isCorrect = userAnswer === q.correct_breed_id;
             const correctBreed = breedMap.get(q.correct_breed_id);
-            const userBreed = userAnswer ? breedMap.get(userAnswer) : null;
+            const userBreed = userAnswer ? getBreedByAnswerId(userAnswer) : null;
 
             return (
               <View key={i} style={[styles.questionResult, isCorrect ? styles.questionResultCorrect : styles.questionResultWrong]}>

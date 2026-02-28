@@ -86,21 +86,24 @@ function generateDifferenceChoice(correctBreed: Breed, options: Breed[]): QuizQu
 
   // Pick a distinguishing feature of the correct breed
   const feature = randomChoice(correctBreed.distinguishing_features);
+  const wrongFeatures = randomSample(
+    similarBreed.distinguishing_features,
+    Math.min(3, similarBreed.distinguishing_features.length),
+  );
 
   return {
     type: 'difference_choice',
-    question_text: `${correctBreed.name_ja}と${similarBreed.name_ja}の\n最も大きな違いは？`,
+    // Clearly state which breed the user should identify
+    question_text: `${similarBreed.name_ja}と似ている品種で\n${correctBreed.name_ja}だけの\n特徴はどれ？`,
     correct_breed_id: correctBreed.id,
+    // Use unique IDs for wrong options to avoid multi-highlight bug
     options: shuffle([
       { breed_id: correctBreed.id, label: feature },
-      ...randomSample(
-        similarBreed.distinguishing_features.map((f) => ({
-          breed_id: similarBreed.id,
-          label: f,
-        })),
-        Math.min(3, similarBreed.distinguishing_features.length),
-      ),
-    ].slice(0, 4)),
+      ...wrongFeatures.map((f, i) => ({
+        breed_id: `${similarBreed.id}_w${i}`,
+        label: f,
+      })),
+    ]).slice(0, 4),
   };
 }
 
