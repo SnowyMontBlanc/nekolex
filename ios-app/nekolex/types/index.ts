@@ -53,7 +53,7 @@ export interface QuizResult {
   xp_gained: number;
 }
 
-// Claude API identification result
+// AI identification result
 export interface IdentificationResult {
   breed_id: string;
   confidence: number;

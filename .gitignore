@@ -9,7 +9,7 @@
 .env.local
 .env*.local
 
-# AI tooling (Claude Code / Serena)
+# Local development tools
 .claude/
 .serena/
 CLAUDE.md

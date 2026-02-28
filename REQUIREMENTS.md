@@ -35,7 +35,7 @@
 
 **機能**:
 - カメラで撮影 OR ギャラリーから画像選択
-- Claude APIによる品種自動識別
+- Gemini APIによる品種自動識別
 - 識別結果表示 (品種名 + 信頼度)
 - 図鑑への自動登録
 - 発見時のアニメーション演出
@@ -60,7 +60,7 @@
 **技術仕様**:
 - expo-image-picker: カメラ撮影 (launchCameraAsync) & ギャラリー選択 (launchImageLibraryAsync)
 - expo-image-manipulator: 送信前の画像リサイズ
-- Claude API (tool_use): 構造化された識別結果の取得
+- Gemini API (responseSchema): 構造化された識別結果の取得
 - Base64エンコーディングで画像送信
 
 ---
