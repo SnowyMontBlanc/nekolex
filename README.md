@@ -81,14 +81,13 @@ QRコードを Expo Go アプリで読み取るか、シミュレーターで起
 
 ```
 nekolex/
-├── ios-app/nekolex/        # Expo アプリ本体
-│   ├── app/                # 画面 (Expo Router)
-│   ├── components/         # 共通コンポーネント
-│   ├── services/           # API・ストレージ処理
-│   ├── data/breeds.json    # 品種マスターデータ (20品種)
-│   ├── contexts/           # React Context (状態管理)
-│   └── utils/              # クイズ生成・XP計算
-└── docs/                   # 実装チケット
+└── ios-app/nekolex/        # Expo アプリ本体
+    ├── app/                # 画面 (Expo Router)
+    ├── components/         # 共通コンポーネント
+    ├── services/           # API・ストレージ処理
+    ├── data/breeds.json    # 品種マスターデータ (20品種)
+    ├── contexts/           # React Context (状態管理)
+    └── utils/              # クイズ生成・XP計算
 ```
 
 ---
