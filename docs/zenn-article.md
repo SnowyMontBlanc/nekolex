@@ -6,16 +6,18 @@ topics: ["reactnative", "expo", "gemini", "ai", "個人開発"]
 published: false
 ---
 
-## 🐈 はじめに
+## はじめに
 
 街で見かけた猫や、友達の飼っている猫の品種って、意外とわからないこと多くないですか？
 調べてみて「へー」と思っても、次に似た猫を見かけたときにはすっかり忘れていたり…。
 
 そこで、**写真を撮るだけで猫の品種を識別して、ポケモン図鑑みたいにコレクションできるアプリ「NekoLex（ネコレックス）」** を作ってみました。
 
-| 📸 写真で識別 | 📚 図鑑でコレクション | 🎮 クイズで復習 |
-|:---:|:---:|:---:|
-| <img src="https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%86%99%E7%9C%9F%E3%81%A7%E8%AD%98%E5%88%A5.gif" width="250" /> | <img src="https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%9B%B3%E9%91%91.png" width="250" /> | <img src="https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%BE%A9%E7%BF%92%E3%82%AF%E3%82%A4%E3%82%BA.gif" width="250" /> |
+![写真で識別](https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%86%99%E7%9C%9F%E3%81%A7%E8%AD%98%E5%88%A5.gif =300x)
+
+![図鑑でコレクション](https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%9B%B3%E9%91%91.png =300x)
+
+![クイズで復習](https://raw.githubusercontent.com/SnowyMontBlanc/nekolex/main/assets/screenshots/%E5%BE%A9%E7%BF%92%E3%82%AF%E3%82%A4%E3%82%BA.gif =300x)
 
 このアプリの裏側（画像の品種判定）には、Googleの **Gemini 2.5 Flash API** を使っています。
 
@@ -26,7 +28,7 @@ https://github.com/SnowyMontBlanc/nekolex
 
 ---
 
-## 🛠 使用技術
+## 使用技術
 
 * **フロントエンド**: React Native (0.81) / Expo (SDK 54) / TypeScript
 * **ルーティング**: Expo Router v6
@@ -35,7 +37,7 @@ https://github.com/SnowyMontBlanc/nekolex
 
 ---
 
-## 💡 なぜ Gemini API を選んだのか？
+## なぜ Gemini API を選んだのか？
 
 個人開発のMVP（まずは動くものを作る段階）で数あるAIモデルの中から Gemini 2.5 Flash を選んだ理由は主に2つです。
 
@@ -46,7 +48,7 @@ https://github.com/SnowyMontBlanc/nekolex
 
 ---
 
-## 📸 1. アプリ側での画像処理（送信前の工夫）
+## 1. アプリ側での画像処理（送信前の工夫）
 
 今のスマホカメラで撮った画像は数MB〜十数MBとかなり大きいです。これをそのまま Base64 化して API に投げると、通信量も増えるし、APIの制限にも引っかかりやすくなります。
 
@@ -54,7 +56,7 @@ https://github.com/SnowyMontBlanc/nekolex
 品種の判定をするくらいなら、長辺800pxもあれば十分です。
 
 :::message
-💡 **ポイント**
+**ポイント**
 画像をAPIに投げる前にリサイズすることで、Geminiの無料枠トークン消費を抑え、通信時のレスポンスタイムも劇的に改善できます。
 :::
 
@@ -83,7 +85,7 @@ export async function prepareImageForApi(imageUri: string) {
 
 ---
 
-## 🤖 2. Gemini API へのリクエスト（Structured Outputs の活用）
+## 2. Gemini API へのリクエスト（Structured Outputs の活用）
 
 ここが一番のポイントです。
 単に「この画像は何の品種？」と聞くと、AI は「これは〇〇という品種で〜」と長文の日本語を返してきちゃいます。でもアプリ側としては、図鑑データと紐付けるために**ID（例：`scottish_fold`）と信頼度の数値だけが欲しい**んですよね。
@@ -169,7 +171,7 @@ export async function identifyBreed(imageBase64: string) {
 ```
 :::
 
-### 💡 実装のポイント解説
+### 実装のポイント解説
 
 実装の中で特に重要だった工夫を3つにまとめました。
 
@@ -181,12 +183,14 @@ export async function identifyBreed(imageBase64: string) {
 配列を動的に `join()` して渡すことで、猫のマスターデータが増えてもAPI側のコードはいじらなくて済むようにしています。
 
 #### 3. エッジケースもプロンプトでカバー
-ユーザーが間違えて「犬」や「机」の写真を送ってきたときにアプリがクラッシュしないよう、以下のルールをプロンプト（`text`）に仕込んでいます。
-> 「猫がいなければ confidence を 0 にして雑種（`mixed_breed`）として扱う」
+ユーザーが間違えて「犬」や「机」の写真を送ってきたときにアプリがおかしくならないよう、以下のルールをプロンプト（`text`）に仕込んでいます。
+> 「猫が写っていない場合は、confidence を 0 にして breed_id を "mixed_breed" としてください」
+
+アプリ側では、このレスポンスの `confidence`（信頼度）が極端に低い（0.1未満）場合は、**「雑種として登録する」のではなく「猫が写っていないようです」というエラー弾き処理**を行っています。この制御をアプリ側で確実に行えるのも、数値が明確なJSONで返ってくるおかげです。
 
 ---
 
-## 🎮 おわりに
+## おわりに
 
 Gemini の Structured Outputs を使ってみたら、画像からのデータ抽出が拍子抜けするほど簡単でした。
 あとは返ってきた JSON の `breed_id` をキーにして、アプリ内に持っている猫の詳細データ（性格や見分け方）とガッチャンコして画面に出すだけです。
