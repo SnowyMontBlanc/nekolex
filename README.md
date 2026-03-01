@@ -8,10 +8,17 @@
 
 ## スクリーンショット
 
-<!-- TODO: アプリ完成後にスクリーンショットを追加 -->
-| ホーム | 図鑑 | 識別結果 | クイズ |
-|--------|------|---------|--------|
-| ![home](docs/screenshots/home.png) | ![pokedex](docs/screenshots/pokedex.png) | ![result](docs/screenshots/result.png) | ![quiz](docs/screenshots/quiz.png) |
+| ホーム | 図鑑 | クイズ | マイページ |
+|--------|------|--------|-----------|
+| ![ホーム](assets/screenshots/ホーム.png) | ![図鑑](assets/screenshots/図鑑.png) | ![クイズ](assets/screenshots/クイズ.png) | ![マイページ](assets/screenshots/マイページ.png) |
+
+---
+
+## デモ
+
+| 写真で識別 | 復習クイズ |
+|-----------|-----------|
+| ![写真で識別](assets/screenshots/写真で識別.gif) | ![復習クイズ](assets/screenshots/復習クイズ.gif) |
 
 ---
 
