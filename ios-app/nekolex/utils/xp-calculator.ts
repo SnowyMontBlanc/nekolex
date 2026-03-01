@@ -51,6 +51,6 @@ export function xpProgress(totalXp: number): {
   return {
     current: progressXp,
     required: requiredXp,
-    percentage: requiredXp > 0 ? Math.min((progressXp / requiredXp) * 100, 100) : 100,
+    percentage: requiredXp > 0 ? Math.min(Math.round((progressXp / requiredXp) * 100), 100) : 100,
   };
 }

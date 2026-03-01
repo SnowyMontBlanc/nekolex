@@ -162,8 +162,8 @@ export default function HomeScreen() {
         {recentDiscoveries.length > 0 && (
           <>
             <View style={styles.sectionRow}>
-              <Ionicons name="time-outline" size={14} color={NekoLexColors.textLight} />
-              <Text style={styles.sectionTitle}>さいきんの発見</Text>
+              <Ionicons name="time-outline" size={16} color={NekoLexColors.textLight} />
+              <Text style={styles.sectionRowTitle}>さいきんの発見</Text>
             </View>
             <ScrollView
               horizontal
@@ -289,6 +289,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: S.screenH,
     paddingTop: S.sectionTop,
     paddingBottom: S.sectionBottom,
+  },
+  // Text inside sectionRow — padding is on the row container, not the text
+  sectionRowTitle: {
+    fontSize: Typography.body.fontSize,
+    fontWeight: '900',
+    color: NekoLexColors.text,
   },
 
   // ── Action cards ─────────────────────────────────────────────────
